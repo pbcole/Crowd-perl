@@ -12,7 +12,6 @@ use Data::Dumper;
 use Data::Dump qw/dump/;
 
 use Module::Find;
-#my @modules = useall Crowd;
 use Crowd::User;
 use Crowd::Error;
 use Crowd::Message;
@@ -20,14 +19,15 @@ use Crowd::Message;
 use XML::Simple;
 
 has 'userAgent' => ( is => 'ro', lazy_build => 1, );
-has server => ( is => 'ro', default => 'crowd', required => 1, );
+has crowd_server => ( is => 'ro', default => 'crowd', required => 1, );
 has port => ( is => 'ro', default => 8095, required => 1, );
 has baseurl => ( is => 'ro', default => '/crowd/rest' );
 has crowd_user => ( is => 'ro', required => 1 );
 has crowd_password => ( is => 'ro', required => 1 );
 
 sub _build_userAgent {
-	my $lwp = LWP::UserAgent->new();
+	my $self = shift;
+	my $lwp = LWP::UserAgent->new( $self->scheme() eq 'https' ? (ssl_opts => { verify_hostname => 1} ) : () );
 	return $lwp;
 }
 
@@ -46,12 +46,11 @@ sub uri {
 	my $self = shift;
 	my $uri = URI->new();
 
-	#my $_addr = "http://".$self->server().":".$self->port().$self->baseurl().$addr;
 	$uri->scheme($self->scheme());
-	$uri->host($self->server());
+	$uri->host($self->crowd_server());
 	$uri->port($self->port());
 	$uri->path($self->baseurl());
-
+print STDERR "Going to connect to uri = ".$uri->as_string()."\n";
 	return $uri;
 }
 
