@@ -27,7 +27,7 @@ has crowd_password => ( is => 'ro', required => 1 );
 
 sub _build_userAgent {
 	my $self = shift;
-	my $lwp = LWP::UserAgent->new( $self->scheme() eq 'https' ? (ssl_opts => { verify_hostname => 1} ) : () );
+	my $lwp = LWP::UserAgent->new( $self->scheme() eq 'https' ? (ssl_opts => { verify_hostname => 0, SSL_version => 'SSLv3', } ) : () );
 	return $lwp;
 }
 

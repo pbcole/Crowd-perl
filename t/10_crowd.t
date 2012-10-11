@@ -66,21 +66,25 @@ my $https_connection = Crowd->new({crowd_user => $config->{crowd}->{username},
                                    scheme => 'https', 
                                    port => 8443, 
                                   });
-ok($working_connection, "Can create an object");
-isa_ok($working_connection, "Crowd", "Is the correct type");
+ok($https_connection, "Can create an object when using https scheme");
+isa_ok($https_connection, "Crowd", "Is the correct type");
 $res = $https_connection->authenticate($config->{realuser}->{username}, $config->{realuser}->{password});
 is(ref($res), "Crowd::Error", "Authenticating a user not in a directory that can be used returns an Error object");
 is($res->message(), "User is not allowed to authenticate with the application", "... Expected error message" );
 is($res->reason(), "INVALID_USER_AUTHENTICATION", "... Expected reason given");
-
-done_testing();
-exit 0;
 
 
 $res = $working_connection->authenticate($config->{testuser}->{username}, $config->{testuser}->{password});
 is(ref($res), "Crowd::User", "Authenticating a valid user returns a Crowd::User object");
 diag "Valid login returned: ";
 print_results($res);
+
+$res = $https_connection->authenticate($config->{testuser}->{username}, $config->{testuser}->{password});
+is(ref($res), "Crowd::User", "Authenticating a valid user returns a Crowd::User object when using https");
+diag "Valid login returned: ";
+print_results($res);
+done_testing();
+exit 0;
 
 $res = $working_connection->lookup_user($config->{testuser}->{username});
 is(ref($res), "Crowd::User", "Looking up a valid user returns a Crowd::User object");
